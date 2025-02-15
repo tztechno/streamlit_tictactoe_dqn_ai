@@ -48,27 +48,24 @@ class TicTacToeAI:
             valid_q_values[0, [i for i in range(9) if i not in self._valid_actions(state)]] = float('-inf')
             return valid_q_values.max(1)[1].item()
 
-
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}
     
-    # CSSでグリッドレイアウトを設定
+    # カスタムCSS
     st.markdown("""
         <style>
-        .grid-container {
+        .game-board {
             display: grid;
-            grid-template-columns: repeat(3, 60px);
-            grid-template-rows: repeat(3, 60px);
-            gap: 4px;
-            justify-content: center;
-            margin: 0 auto;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
             max-width: 300px;
+            margin: 0 auto;
         }
-        .grid-container > div {
+        .game-cell {
+            aspect-ratio: 1;
             width: 100%;
-            height: 100%;
         }
-        .stButton > button {
+        .game-cell button {
             width: 100% !important;
             height: 100% !important;
             font-size: 24px !important;
@@ -78,36 +75,34 @@ def create_board_buttons(state, valid_moves):
         </style>
     """, unsafe_allow_html=True)
     
-    # グリッドコンテナを開始
-    st.markdown('<div class="grid-container">', unsafe_allow_html=True)
-    
-    # ボタンを配置
+    # CSSグリッドを使用したボードの作成
+    st.markdown('<div class="game-board">', unsafe_allow_html=True)
     buttons = []
     for i in range(9):
-        st.markdown(f'<div class="grid-item">', unsafe_allow_html=True)
-        if state[i] == 0 and i in valid_moves:
-            button = st.button(f"{symbols[state[i]]}", key=f"button_{i}")
-        else:
-            button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                             disabled=True)
-        buttons.append(button)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    # グリッドコンテナを閉じる
+        with st.container():
+            st.markdown(f'<div class="game-cell">', unsafe_allow_html=True)
+            if state[i] == 0 and i in valid_moves:
+                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                                 help=f"Position {i}")
+            else:
+                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                                 disabled=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            buttons.append(button)
     st.markdown('</div>', unsafe_allow_html=True)
     
     return buttons
 
-
 def initialize_game(human_first, game_ai=None):
     initial_state = {
         'board': np.zeros(9, dtype=int),
-        'current_player': 1,
+        'current_player': 1,  # 1 for X, -1 for O
         'game_over': False,
         'message': "Game started! You are X" if human_first else "Game started! You are O",
         'human_symbol': 1 if human_first else -1
     }
     
+    # AIが先手（人間が後手）の場合、AIの最初の手を実行
     if not human_first and game_ai is not None:
         action = game_ai._get_ai_action(initial_state['board'], 1)
         initial_state['board'][action] = 1
@@ -117,10 +112,7 @@ def initialize_game(human_first, game_ai=None):
     return initial_state
 
 def main():
-    st.title("TicTacToe AI Game")
-    
-    # 画面の中央に配置するためのコンテナ
-    st.markdown('<div class="board-container">', unsafe_allow_html=True)
+    st.title("TicTacToe vs AI")
     
     # Initialize AI and load model
     game = TicTacToeAI()
@@ -136,7 +128,7 @@ def main():
     ) == "Play as X (First)"
     
     # Initialize or reset game state
-    if 'game_state' not in st.session_state or st.sidebar.button("Reset Game"):
+    if 'game_state' not in st.session_state or st.sidebar.button("Reset"):
         st.session_state.game_state = initialize_game(human_first, game)
     
     # Display current game status
@@ -147,8 +139,6 @@ def main():
     
     # Create the game board
     buttons = create_board_buttons(st.session_state.game_state['board'], valid_moves)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     
     # Handle game moves
     if not st.session_state.game_state['game_over']:

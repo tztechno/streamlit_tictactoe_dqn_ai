@@ -55,12 +55,16 @@ def create_board_buttons(state, valid_moves):
     st.markdown("""
         <style>
         div[data-testid="column"] {
-            width: 33% !important;  /* 3列にするため、幅を固定 */
+            width: 33% !important;
             display: inline-block;
+            padding: 0 !important;  /* 余計な余白を削除 */
+            text-align: center;
         }
         div[data-testid="stHorizontalBlock"] {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             width: 100% !important;
-            margin: auto;
         }
         .stButton button {
             width: 50px !important;
@@ -68,6 +72,16 @@ def create_board_buttons(state, valid_moves):
             font-size: 24px !important;
             font-weight: bold !important;
             padding: 0px !important;
+        }
+        @media (max-width: 600px) {
+            div[data-testid="column"] {
+                width: 100% !important; /* スマホで1列に表示 */
+            }
+            .stButton button {
+                width: 40px !important;
+                height: 40px !important;  /* スマホではボタンを少し小さく */
+                font-size: 18px !important;
+            }
         }
         </style>
     """, unsafe_allow_html=True)

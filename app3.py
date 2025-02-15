@@ -71,7 +71,7 @@ def create_board_buttons(state, valid_moves):
             align-items: center;
             justify-content: center;
         }
-        .game-cell button {
+        .stButton button {
             width: 100%;
             height: 100%;
             font-size: 24px;
@@ -81,31 +81,22 @@ def create_board_buttons(state, valid_moves):
         </style>
     """, unsafe_allow_html=True)
 
-    # 3x3 のボードをHTMLで作成
-    board_html = '<div class="game-board">'
+    buttons = []
     
+    # Streamlitのボタンを使い、3x3のボードを作成
+    st.markdown('<div class="game-board">', unsafe_allow_html=True)
     for i in range(9):
-        if state[i] == 0 and i in valid_moves:
-            button_html = f"""
-            <div class="game-cell">
-                <form action="" method="post">
-                    <input type="hidden" name="position" value="{i}">
-                    <button name="move" value="{i}">{symbols[state[i]]}</button>
-                </form>
-            </div>
-            """
-        else:
-            button_html = f"""
-            <div class="game-cell">
-                <button disabled>{symbols[state[i]]}</button>
-            </div>
-            """
-        board_html += button_html
+        with st.container():
+            st.markdown('<div class="game-cell">', unsafe_allow_html=True)
+            if state[i] == 0 and i in valid_moves:
+                button = st.button(symbols[state[i]], key=f"button_{i}")
+            else:
+                button = st.button(symbols[state[i]], key=f"button_{i}", disabled=True)
+            buttons.append(button)
+            st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    board_html += '</div>'
-
-    # HTMLを表示
-    st.write(board_html, unsafe_allow_html=True)
+    return buttons
 
 
 

@@ -49,8 +49,6 @@ class TicTacToeAI:
             return valid_q_values.max(1)[1].item()
 
 
-import streamlit as st
-
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
     

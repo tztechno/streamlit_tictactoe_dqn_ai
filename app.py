@@ -66,17 +66,26 @@ def create_board_buttons(state, valid_moves):
             buttons.append(button)
     return buttons
 
-def initialize_game(human_first):
-    return {
+def initialize_game(human_first, game_ai=None):
+    initial_state = {
         'board': np.zeros(9, dtype=int),
         'current_player': 1,  # 1 for X, -1 for O
         'game_over': False,
         'message': "Game started! You are X" if human_first else "Game started! You are O",
         'human_symbol': 1 if human_first else -1
     }
+    
+    # AIが先手（人間が後手）の場合、AIの最初の手を実行
+    if not human_first and game_ai is not None:
+        action = game_ai._get_ai_action(initial_state['board'], 1)
+        initial_state['board'][action] = 1
+        initial_state['current_player'] = -1
+        initial_state['message'] = "Your turn!"
+    
+    return initial_state
 
 def main():
-    st.title("Tic-tac-toe AI Game")
+    st.title("TicTacToe AI Game")
     
     # Initialize AI and load model
     game = TicTacToeAI()
@@ -93,7 +102,7 @@ def main():
     
     # Initialize or reset game state
     if 'game_state' not in st.session_state or st.sidebar.button("Reset Game"):
-        st.session_state.game_state = initialize_game(human_first)
+        st.session_state.game_state = initialize_game(human_first, game)
     
     # Display current game status
     st.write(st.session_state.game_state['message'])

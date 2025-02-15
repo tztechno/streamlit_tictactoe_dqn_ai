@@ -47,6 +47,10 @@ class TicTacToeAI:
             valid_q_values = q_values.clone()
             valid_q_values[0, [i for i in range(9) if i not in self._valid_actions(state)]] = float('-inf')
             return valid_q_values.max(1)[1].item()
+ 
+    
+# CSSグリッドを使用したボードの作成
+st.markdown('<div class="game-board">', unsafe_allow_html=True)
 
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}
@@ -75,23 +79,23 @@ def create_board_buttons(state, valid_moves):
         </style>
     """, unsafe_allow_html=True)
     
-    # CSSグリッドを使用したボードの作成
-    st.markdown('<div class="game-board">', unsafe_allow_html=True)
     buttons = []
-    for i in range(9):
-        with st.container():
-            st.markdown(f'<div class="game-cell">', unsafe_allow_html=True)
-            if state[i] == 0 and i in valid_moves:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 help=f"Position {i}")
-            else:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 disabled=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-            buttons.append(button)
-    st.markdown('</div>', unsafe_allow_html=True)
+    
+    for row in range(3):
+        cols = st.columns(3)  # 3列を作成
+        for col in range(3):
+            i = row * 3 + col  # インデックス計算
+            with cols[col]:
+                if state[i] == 0 and i in valid_moves:
+                    button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                                       help=f"Position {i}")
+                else:
+                    button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                                       disabled=True)
+                buttons.append(button)
     
     return buttons
+
 
 def initialize_game(human_first, game_ai=None):
     initial_state = {

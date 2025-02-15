@@ -59,8 +59,8 @@ def create_board_buttons(state, valid_moves):
             margin: 0 auto;
         }
         .stButton button {
-            width: 60px !important;
-            height: 60px !important;
+            width: 50px !important;
+            height: 50px !important;
             font-size: 24px !important;
             font-weight: bold !important;
             padding: 0px !important;

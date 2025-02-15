@@ -49,7 +49,29 @@ class TicTacToeAI:
             return valid_q_values.max(1)[1].item()
 
 def create_board_buttons(state, valid_moves):
-    symbols = {0: "", 1: "X", -1: "O"}
+    symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
+    
+    # カスタムCSS
+    st.markdown("""
+        <style>
+        div[data-testid="column"] {
+            width: fit-content !important;
+            flex: unset;
+        }
+        div[data-testid="stHorizontalBlock"] {
+            width: fit-content !important;
+            margin: auto;
+        }
+        .stButton button {
+            width: 60px !important;
+            height: 60px !important;
+            font-size: 24px !important;
+            font-weight: bold !important;
+            padding: 0px !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
     cols = st.columns(3)
     buttons = []
     for i in range(9):
@@ -57,11 +79,9 @@ def create_board_buttons(state, valid_moves):
         with cols[col_idx]:
             if state[i] == 0 and i in valid_moves:
                 button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 use_container_width=True, 
                                  help=f"Position {i}")
             else:
                 button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 use_container_width=True, 
                                  disabled=True)
             buttons.append(button)
     return buttons
@@ -85,11 +105,11 @@ def initialize_game(human_first, game_ai=None):
     return initial_state
 
 def main():
-    st.title("TicTacToe AI Game")
+    st.title("Tic-tac-toe AI Game")
     
     # Initialize AI and load model
     game = TicTacToeAI()
-    model_path = "tictactoe_model.pth"  # モデルファイルは同じフォルダに配置
+    model_path = "tictactoe_model.pth"
     game.load_model(model_path)
     
     # Add player order selection in sidebar

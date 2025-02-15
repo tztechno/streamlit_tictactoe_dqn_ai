@@ -2,7 +2,7 @@
 
 2025-02-15
 
-app2: PCでは表示は良好だが、スマホでは縦に並んでしまう
+app2: PCでは表示は良好、スマホは横向きにして立ち上げると良好な表示
 
 https://tictactoe-dugwft9nr7ketbwa6uhvp4.streamlit.app/
 

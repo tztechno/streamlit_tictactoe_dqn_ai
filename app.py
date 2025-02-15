@@ -48,32 +48,43 @@ class TicTacToeAI:
             valid_q_values[0, [i for i in range(9) if i not in self._valid_actions(state)]] = float('-inf')
             return valid_q_values.max(1)[1].item()
 
-
-
-
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
     
-    buttons = []
+    # カスタムCSS
+    st.markdown("""
+        <style>
+        div[data-testid="column"] {
+            width: fit-content !important;
+            flex: unset;
+        }
+        div[data-testid="stHorizontalBlock"] {
+            width: fit-content !important;
+            margin: auto;
+        }
+        .stButton button {
+            width: 50px !important;
+            height: 50px !important;
+            font-size: 24px !important;
+            font-weight: bold !important;
+            padding: 0px !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
     
-    # 3行×3列のグリッドを作成
-    with st.container():  # コンテナを使うことでレイアウトを固定
-        for row in range(3):  # 3行ループ
-            cols = st.columns(3)  # 各行で3つのカラムを作成
-            for col in range(3):  # 3列ループ
-                i = row * 3 + col  # 配列のインデックスを計算
-                with cols[col]:  # カラムの中にボタンを配置
-                    if state[i] == 0 and i in valid_moves:
-                        button = st.button(symbols[state[i]], key=f"button_{i}")
-                    else:
-                        button = st.button(symbols[state[i]], key=f"button_{i}", disabled=True)
-                    buttons.append(button)
-
+    cols = st.columns(3)
+    buttons = []
+    for i in range(9):
+        col_idx = i % 3
+        with cols[col_idx]:
+            if state[i] == 0 and i in valid_moves:
+                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                                 help=f"Position {i}")
+            else:
+                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                                 disabled=True)
+            buttons.append(button)
     return buttons
-
-
-
-
 
 def initialize_game(human_first, game_ai=None):
     initial_state = {

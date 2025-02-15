@@ -1,6 +1,6 @@
 
 ```
-失敗
+失敗：改善なし
 st.markdown("""
     <style>
     .stButton {
@@ -28,6 +28,24 @@ st.markdown("""
 ```
 
 ```
-オリジナル
-
+オリジナル：PC良好、スマホでカラムが縦になぶ
+st.markdown("""
+    <style>
+    div[data-testid="column"] {
+        width: fit-content !important;
+        flex: unset;
+    }
+    div[data-testid="stHorizontalBlock"] {
+        width: fit-content !important;
+        margin: auto;
+    }
+    .stButton button {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 24px !important;
+        font-weight: bold !important;
+        padding: 0px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 ```

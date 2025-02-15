@@ -66,91 +66,86 @@ def create_board_buttons(state, valid_moves):
             buttons.append(button)
     return buttons
 
+def initialize_game(human_first):
+    return {
+        'board': np.zeros(9, dtype=int),
+        'current_player': 1,  # 1 for X, -1 for O
+        'game_over': False,
+        'message': "Game started! You are X" if human_first else "Game started! You are O",
+        'human_symbol': 1 if human_first else -1
+    }
+
 def main():
     st.title("Tic-tac-toe AI Game")
     
-    # Initialize game state in session state
-    if 'game_state' not in st.session_state:
-        st.session_state.game_state = {
-            'board': np.zeros(9, dtype=int),
-            'current_player': 1,
-            'game_over': False,
-            'message': "Game started! You are X"
-        }
-
-    # Initialize AI
+    # Initialize AI and load model
     game = TicTacToeAI()
+    model_path = "tictactoe_model.pth"  # モデルファイルは同じフォルダに配置
+    game.load_model(model_path)
     
-    # Add a file uploader for the model
-    model_file = st.file_uploader("Upload AI model file (tictactoe_model.pth)", type=['pth'])
+    # Add player order selection in sidebar
+    st.sidebar.title("Game Settings")
+    human_first = st.sidebar.radio(
+        "Choose your role:",
+        ["Play as X (First)", "Play as O (Second)"],
+        index=0
+    ) == "Play as X (First)"
     
-    if model_file is not None:
-        # Save the uploaded file temporarily
-        with open("temp_model.pth", "wb") as f:
-            f.write(model_file.getvalue())
-        game.load_model("temp_model.pth")
-        os.remove("temp_model.pth")  # Clean up the temporary file
+    # Initialize or reset game state
+    if 'game_state' not in st.session_state or st.sidebar.button("Reset Game"):
+        st.session_state.game_state = initialize_game(human_first)
+    
+    # Display current game status
+    st.write(st.session_state.game_state['message'])
+    
+    # Get valid moves
+    valid_moves = game._valid_actions(st.session_state.game_state['board'])
+    
+    # Create the game board
+    buttons = create_board_buttons(st.session_state.game_state['board'], valid_moves)
+    
+    # Handle game moves
+    if not st.session_state.game_state['game_over']:
+        current_player = st.session_state.game_state['current_player']
+        is_human_turn = (current_player == st.session_state.game_state['human_symbol'])
         
-        # Game controls
-        if st.button("Reset Game"):
-            st.session_state.game_state = {
-                'board': np.zeros(9, dtype=int),
-                'current_player': 1,
-                'game_over': False,
-                'message': "Game started! You are X"
-            }
-        
-        # Display current game status
-        st.write(st.session_state.game_state['message'])
-        
-        # Get valid moves
-        valid_moves = game._valid_actions(st.session_state.game_state['board'])
-        
-        # Create the game board
-        buttons = create_board_buttons(st.session_state.game_state['board'], valid_moves)
-        
-        # Handle player moves
-        if not st.session_state.game_state['game_over']:
+        if is_human_turn:
             # Human turn
-            if st.session_state.game_state['current_player'] == 1:
-                for i, clicked in enumerate(buttons):
-                    if clicked and i in valid_moves:
-                        st.session_state.game_state['board'][i] = 1
-                        reward = game._get_reward(st.session_state.game_state['board'], 1)
-                        
-                        if reward == 1:
-                            st.session_state.game_state['game_over'] = True
-                            st.session_state.game_state['message'] = "You win!"
-                            st.rerun()
-                        elif reward == 0.5:
-                            st.session_state.game_state['game_over'] = True
-                            st.session_state.game_state['message'] = "It's a draw!"
-                            st.rerun()
-                        else:
-                            st.session_state.game_state['current_player'] = -1
-                            st.session_state.game_state['message'] = "AI's turn..."
-                            st.rerun()
-            
+            for i, clicked in enumerate(buttons):
+                if clicked and i in valid_moves:
+                    st.session_state.game_state['board'][i] = current_player
+                    reward = game._get_reward(st.session_state.game_state['board'], current_player)
+                    
+                    if reward == 1:
+                        st.session_state.game_state['game_over'] = True
+                        st.session_state.game_state['message'] = "You win!"
+                        st.rerun()
+                    elif reward == 0.5:
+                        st.session_state.game_state['game_over'] = True
+                        st.session_state.game_state['message'] = "It's a draw!"
+                        st.rerun()
+                    else:
+                        st.session_state.game_state['current_player'] *= -1
+                        st.session_state.game_state['message'] = "AI's turn..."
+                        st.rerun()
+        else:
             # AI turn
+            action = game._get_ai_action(st.session_state.game_state['board'], current_player)
+            st.session_state.game_state['board'][action] = current_player
+            reward = game._get_reward(st.session_state.game_state['board'], current_player)
+            
+            if reward == 1:
+                st.session_state.game_state['game_over'] = True
+                st.session_state.game_state['message'] = "AI wins!"
+                st.rerun()
+            elif reward == 0.5:
+                st.session_state.game_state['game_over'] = True
+                st.session_state.game_state['message'] = "It's a draw!"
+                st.rerun()
             else:
-                action = game._get_ai_action(st.session_state.game_state['board'], -1)
-                st.session_state.game_state['board'][action] = -1
-                reward = game._get_reward(st.session_state.game_state['board'], -1)
-                
-                if reward == 1:
-                    st.session_state.game_state['game_over'] = True
-                    st.session_state.game_state['message'] = "AI wins!"
-                    st.rerun()
-                elif reward == 0.5:
-                    st.session_state.game_state['game_over'] = True
-                    st.session_state.game_state['message'] = "It's a draw!"
-                    st.rerun()
-                else:
-                    st.session_state.game_state['current_player'] = 1
-                    st.session_state.game_state['message'] = "Your turn!"
-                    st.rerun()
-    else:
-        st.write("Please upload the AI model file to start playing!")
+                st.session_state.game_state['current_player'] *= -1
+                st.session_state.game_state['message'] = "Your turn!"
+                st.rerun()
 
 if __name__ == "__main__":
     main()

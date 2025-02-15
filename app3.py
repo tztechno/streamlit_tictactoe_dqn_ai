@@ -49,6 +49,8 @@ class TicTacToeAI:
             return valid_q_values.max(1)[1].item()
 
 
+import streamlit as st
+
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
     
@@ -57,41 +59,57 @@ def create_board_buttons(state, valid_moves):
         <style>
         .game-board {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);  /* 3列 */
-            grid-template-rows: repeat(3, 1fr);     /* 3行 */
-            gap: 5px;
+            grid-template-columns: repeat(3, 1fr);  /* 3列レイアウト */
+            grid-gap: 5px;
             max-width: 180px;
             margin: auto;
         }
         .game-cell {
-            aspect-ratio: 1;
-            width: 100%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .game-cell button {
-            width: 100% !important;
-            height: 100% !important;
-            font-size: 24px !important;
-            font-weight: bold !important;
-            padding: 0px !important;
+            width: 100%;
+            height: 100%;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 0;
         }
         </style>
     """, unsafe_allow_html=True)
-    
-    # 3x3 のボードを作成
-    st.markdown('<div class="game-board">', unsafe_allow_html=True)
-    buttons = []
-    for i in range(9):
-        with st.container():
-            st.markdown(f'<div class="game-cell">', unsafe_allow_html=True)
-            if state[i] == 0 and i in valid_moves:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", help=f"Position {i}")
-            else:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", disabled=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-            buttons.append(button)
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    return buttons
+    # 3x3 のボードをHTMLで作成
+    board_html = '<div class="game-board">'
+    
+    for i in range(9):
+        if state[i] == 0 and i in valid_moves:
+            button_html = f"""
+            <div class="game-cell">
+                <form action="" method="post">
+                    <input type="hidden" name="position" value="{i}">
+                    <button name="move" value="{i}">{symbols[state[i]]}</button>
+                </form>
+            </div>
+            """
+        else:
+            button_html = f"""
+            <div class="game-cell">
+                <button disabled>{symbols[state[i]]}</button>
+            </div>
+            """
+        board_html += button_html
+
+    board_html += '</div>'
+
+    # HTMLを表示
+    st.write(board_html, unsafe_allow_html=True)
+
+
+
+
 
 def initialize_game(human_first, game_ai=None):
     initial_state = {

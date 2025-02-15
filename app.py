@@ -51,6 +51,7 @@ class TicTacToeAI:
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
     
+    #################################################
     # カスタムCSS
     st.markdown("""
         <style>
@@ -76,7 +77,8 @@ def create_board_buttons(state, valid_moves):
         }
         </style>
     """, unsafe_allow_html=True)
-      
+    #################################################
+    
     cols = st.columns(3)
     buttons = []
     for i in range(9):

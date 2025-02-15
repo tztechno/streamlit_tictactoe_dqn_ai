@@ -49,53 +49,58 @@ class TicTacToeAI:
             return valid_q_values.max(1)[1].item()
 
 def create_board_buttons(state, valid_moves):
-    symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
+    symbols = {0: "　", 1: "❌", -1: "⭕"}
     
     # カスタムCSS
     st.markdown("""
         <style>
-        div[data-testid="column"] {
-            width: fit-content !important;
-            flex: unset;
-        }
-        div[data-testid="stHorizontalBlock"] {
-            width: fit-content !important;
-            margin: auto;
+        .board-container {
+            max-width: 300px;
+            margin: 0 auto;
         }
         .stButton button {
-            width: 50px !important;
-            height: 50px !important;
+            width: 60px !important;
+            height: 60px !important;
             font-size: 24px !important;
             font-weight: bold !important;
             padding: 0px !important;
+            margin: 2px !important;
+        }
+        .board-row {
+            display: flex;
+            justify-content: center;
         }
         </style>
     """, unsafe_allow_html=True)
     
-    cols = st.columns(3)
+    # ボードを3x3のグリッドで表示
     buttons = []
-    for i in range(9):
-        col_idx = i % 3
-        with cols[col_idx]:
-            if state[i] == 0 and i in valid_moves:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 help=f"Position {i}")
-            else:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 disabled=True)
-            buttons.append(button)
+    for row in range(3):
+        # 各行のコンテナを作成
+        st.markdown('<div class="board-row">', unsafe_allow_html=True)
+        cols = st.columns(3)
+        for col in range(3):
+            i = row * 3 + col
+            with cols[col]:
+                if state[i] == 0 and i in valid_moves:
+                    button = st.button(f"{symbols[state[i]]}", key=f"button_{i}")
+                else:
+                    button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                                     disabled=True)
+                buttons.append(button)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     return buttons
 
 def initialize_game(human_first, game_ai=None):
     initial_state = {
         'board': np.zeros(9, dtype=int),
-        'current_player': 1,  # 1 for X, -1 for O
+        'current_player': 1,
         'game_over': False,
         'message': "Game started! You are X" if human_first else "Game started! You are O",
         'human_symbol': 1 if human_first else -1
     }
     
-    # AIが先手（人間が後手）の場合、AIの最初の手を実行
     if not human_first and game_ai is not None:
         action = game_ai._get_ai_action(initial_state['board'], 1)
         initial_state['board'][action] = 1
@@ -105,7 +110,10 @@ def initialize_game(human_first, game_ai=None):
     return initial_state
 
 def main():
-    st.title("TicTacToe vs AI")
+    st.title("TicTacToe AI Game")
+    
+    # 画面の中央に配置するためのコンテナ
+    st.markdown('<div class="board-container">', unsafe_allow_html=True)
     
     # Initialize AI and load model
     game = TicTacToeAI()
@@ -121,7 +129,7 @@ def main():
     ) == "Play as X (First)"
     
     # Initialize or reset game state
-    if 'game_state' not in st.session_state or st.sidebar.button("Reset"):
+    if 'game_state' not in st.session_state or st.sidebar.button("Reset Game"):
         st.session_state.game_state = initialize_game(human_first, game)
     
     # Display current game status
@@ -132,6 +140,8 @@ def main():
     
     # Create the game board
     buttons = create_board_buttons(st.session_state.game_state['board'], valid_moves)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Handle game moves
     if not st.session_state.game_state['game_over']:

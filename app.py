@@ -54,47 +54,17 @@ class TicTacToeAI:
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
     
-    # カスタムCSS
-    st.markdown("""
-        <style>
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);  /* 3列レイアウト */
-            grid-gap: 5px;
-            max-width: 180px;
-            margin: auto;
-        }
-        .game-cell {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .stButton button {
-            width: 100%;
-            height: 100%;
-            font-size: 24px;
-            font-weight: bold;
-            padding: 0;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
     buttons = []
-    
-    # Streamlitのボタンを使い、3x3のボードを作成
-    st.markdown('<div class="game-board">', unsafe_allow_html=True)
-    for i in range(9):
-        with st.container():
-            st.markdown('<div class="game-cell">', unsafe_allow_html=True)
-            if state[i] == 0 and i in valid_moves:
-                button = st.button(symbols[state[i]], key=f"button_{i}")
-            else:
-                button = st.button(symbols[state[i]], key=f"button_{i}", disabled=True)
-            buttons.append(button)
-            st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    for row in range(3):  # 3行ループ
+        cols = st.columns(3)  # 各行で3つのカラムを作成
+        for col in range(3):  # 3列ループ
+            i = row * 3 + col  # 配列のインデックスを計算
+            with cols[col]:  # カラムの中にボタンを配置
+                if state[i] == 0 and i in valid_moves:
+                    button = st.button(symbols[state[i]], key=f"button_{i}")
+                else:
+                    button = st.button(symbols[state[i]], key=f"button_{i}", disabled=True)
+                buttons.append(button)
 
     return buttons
 

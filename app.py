@@ -55,18 +55,22 @@ def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
     
     buttons = []
-    for row in range(3):  # 3行ループ
-        cols = st.columns(3)  # 各行で3つのカラムを作成
-        for col in range(3):  # 3列ループ
-            i = row * 3 + col  # 配列のインデックスを計算
-            with cols[col]:  # カラムの中にボタンを配置
-                if state[i] == 0 and i in valid_moves:
-                    button = st.button(symbols[state[i]], key=f"button_{i}")
-                else:
-                    button = st.button(symbols[state[i]], key=f"button_{i}", disabled=True)
-                buttons.append(button)
+    
+    # 3行×3列のグリッドを作成
+    with st.container():  # コンテナを使うことでレイアウトを固定
+        for row in range(3):  # 3行ループ
+            cols = st.columns(3)  # 各行で3つのカラムを作成
+            for col in range(3):  # 3列ループ
+                i = row * 3 + col  # 配列のインデックスを計算
+                with cols[col]:  # カラムの中にボタンを配置
+                    if state[i] == 0 and i in valid_moves:
+                        button = st.button(symbols[state[i]], key=f"button_{i}")
+                    else:
+                        button = st.button(symbols[state[i]], key=f"button_{i}", disabled=True)
+                    buttons.append(button)
 
     return buttons
+
 
 
 

@@ -105,7 +105,7 @@ def initialize_game(human_first, game_ai=None):
     return initial_state
 
 def main():
-    st.title("TicTacToe Human vs AI")
+    st.title("TicTacToe vs AI")
     
     # Initialize AI and load model
     game = TicTacToeAI()

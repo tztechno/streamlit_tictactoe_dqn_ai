@@ -48,23 +48,28 @@ class TicTacToeAI:
             valid_q_values[0, [i for i in range(9) if i not in self._valid_actions(state)]] = float('-inf')
             return valid_q_values.max(1)[1].item()
 
+
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}  # 全角スペースと絵文字を使用
     
     # カスタムCSS
     st.markdown("""
         <style>
-        div[data-testid="column"] {
-            width: fit-content !important;
-            flex: unset;
-        }
-        div[data-testid="stHorizontalBlock"] {
-            width: fit-content !important;
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);  /* 3列 */
+            grid-template-rows: repeat(3, 1fr);     /* 3行 */
+            gap: 5px;
+            max-width: 180px;
             margin: auto;
         }
-        .stButton button {
-            width: 50px !important;
-            height: 50px !important;
+        .game-cell {
+            aspect-ratio: 1;
+            width: 100%;
+        }
+        .game-cell button {
+            width: 100% !important;
+            height: 100% !important;
             font-size: 24px !important;
             font-weight: bold !important;
             padding: 0px !important;
@@ -72,18 +77,20 @@ def create_board_buttons(state, valid_moves):
         </style>
     """, unsafe_allow_html=True)
     
-    cols = st.columns(3)
+    # 3x3 のボードを作成
+    st.markdown('<div class="game-board">', unsafe_allow_html=True)
     buttons = []
     for i in range(9):
-        col_idx = i % 3
-        with cols[col_idx]:
+        with st.container():
+            st.markdown(f'<div class="game-cell">', unsafe_allow_html=True)
             if state[i] == 0 and i in valid_moves:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 help=f"Position {i}")
+                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", help=f"Position {i}")
             else:
-                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                 disabled=True)
+                button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", disabled=True)
+            st.markdown('</div>', unsafe_allow_html=True)
             buttons.append(button)
+    st.markdown('</div>', unsafe_allow_html=True)
+
     return buttons
 
 def initialize_game(human_first, game_ai=None):

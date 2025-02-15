@@ -48,49 +48,56 @@ class TicTacToeAI:
             valid_q_values[0, [i for i in range(9) if i not in self._valid_actions(state)]] = float('-inf')
             return valid_q_values.max(1)[1].item()
 
+
 def create_board_buttons(state, valid_moves):
     symbols = {0: "　", 1: "❌", -1: "⭕"}
     
-    # カスタムCSS
+    # CSSでグリッドレイアウトを設定
     st.markdown("""
         <style>
-        .board-container {
-            max-width: 300px;
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 4px;
+            justify-content: center;
             margin: 0 auto;
+            max-width: 300px;
         }
-        .stButton button {
-            width: 50px !important;
-            height: 50px !important;
+        .grid-container > div {
+            width: 100%;
+            height: 100%;
+        }
+        .stButton > button {
+            width: 100% !important;
+            height: 100% !important;
             font-size: 24px !important;
             font-weight: bold !important;
             padding: 0px !important;
-            margin: 2px !important;
-        }
-        .board-row {
-            display: flex;
-            justify-content: center;
         }
         </style>
     """, unsafe_allow_html=True)
     
-    # ボードを3x3のグリッドで表示
+    # グリッドコンテナを開始
+    st.markdown('<div class="grid-container">', unsafe_allow_html=True)
+    
+    # ボタンを配置
     buttons = []
-    for row in range(3):
-        # 各行のコンテナを作成
-        st.markdown('<div class="board-row">', unsafe_allow_html=True)
-        cols = st.columns(3)
-        for col in range(3):
-            i = row * 3 + col
-            with cols[col]:
-                if state[i] == 0 and i in valid_moves:
-                    button = st.button(f"{symbols[state[i]]}", key=f"button_{i}")
-                else:
-                    button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
-                                     disabled=True)
-                buttons.append(button)
+    for i in range(9):
+        st.markdown(f'<div class="grid-item">', unsafe_allow_html=True)
+        if state[i] == 0 and i in valid_moves:
+            button = st.button(f"{symbols[state[i]]}", key=f"button_{i}")
+        else:
+            button = st.button(f"{symbols[state[i]]}", key=f"button_{i}", 
+                             disabled=True)
+        buttons.append(button)
         st.markdown('</div>', unsafe_allow_html=True)
     
+    # グリッドコンテナを閉じる
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     return buttons
+
 
 def initialize_game(human_first, game_ai=None):
     initial_state = {

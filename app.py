@@ -105,7 +105,7 @@ def initialize_game(human_first, game_ai=None):
     return initial_state
 
 def main():
-    st.title("Tic-tac-toe AI Game")
+    st.title("TicTacToe Human vs AI")
     
     # Initialize AI and load model
     game = TicTacToeAI()
@@ -121,7 +121,7 @@ def main():
     ) == "Play as X (First)"
     
     # Initialize or reset game state
-    if 'game_state' not in st.session_state or st.sidebar.button("Reset Game"):
+    if 'game_state' not in st.session_state or st.sidebar.button("Reset"):
         st.session_state.game_state = initialize_game(human_first, game)
     
     # Display current game status

@@ -55,11 +55,11 @@ def create_board_buttons(state, valid_moves):
     st.markdown("""
         <style>
         div[data-testid="column"] {
-            width: fit-content !important;
-            flex: unset;
+            width: 33% !important;  /* 3列にするため、幅を固定 */
+            display: inline-block;
         }
         div[data-testid="stHorizontalBlock"] {
-            width: fit-content !important;
+            width: 100% !important;
             margin: auto;
         }
         .stButton button {
@@ -71,7 +71,7 @@ def create_board_buttons(state, valid_moves):
         }
         </style>
     """, unsafe_allow_html=True)
-    
+      
     cols = st.columns(3)
     buttons = []
     for i in range(9):
